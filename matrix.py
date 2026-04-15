@@ -297,7 +297,7 @@ class Matrix:
             print(min_m)
             print(f"{"-" if (r + c) & 1 else ""}(", end = "")
             
-        det_m : Fraction = min_m.det(True)
+        det_m : Fraction = min_m.det(self.DeterminantTypes.COFACTOR, verbose)
         if verbose:
             print(f"\003) = {Fraction(det_m * (-1 if (r + c) & 1 else 1))}", "\n")
         return Fraction(det_m * (-1 if (r + c) & 1 else 1))
@@ -351,6 +351,12 @@ class Matrix:
             det_m *= m[i][i]
         #TODO: check this works
         return det_m
+    
+    def gauss_jordan(self, verbose: bool = False) -> Matrix:
+        m : Matrix = Matrix(self.data, self.line_placement)
+        m = m.upper_triangular(verbose, False, True)
+        m = m.lower_triangular(verbose)
+        return m
 
     def upper_triangular(self, verbose: bool = False, preserve_determinant : bool = False, jordan_pivots: bool = False) -> Matrix:
         m: Matrix = Matrix(self.data, self.line_placement)
@@ -386,6 +392,28 @@ class Matrix:
                     if verbose:
                         print(f"R{r + 1} + {-scalar} R{c + 1}")
                         print(m, "\n")
+        print(f"Last check {m[m.rows - 1][m.rows - 1]}")
+        if jordan_pivots and m[m.rows - 1][m.rows - 1] != 1:
+                if verbose: print(f"F{m.rows - 1}({m[m.rows - 1][m.rows - 1] ** -1})")
+                m = m.scale_row(m.rows - 1, Fraction(1, m[m.rows - 1][m.rows - 1]))
+                if verbose: print(m, "\n")
+        
+        return m
+    
+    def lower_triangular(self, verbose: bool = False) -> Matrix:
+        m: Matrix = Matrix(self.data, self.line_placement)
+
+        for c in range(m.rows - 1, 0, -1):
+            # print(f"Column {c + 1}:")
+            for r in range(c - 1, -1, -1):
+                # print(f"Row {r + 1}:")
+                # print(f"Checking {r + 1}, {c + 1}")
+                if m[r][c] != 0:
+                    scalar : Fraction = m[r][c] / m[c][c]
+                    m = m.add_to_row(r, m.row(c) * -scalar)
+                    if verbose:
+                        print(f"R{r + 1} + {-scalar} R{c + 1}")
+                        print(m, "\n")
         
         return m
 
@@ -394,7 +422,7 @@ class Matrix:
         return Matrix(result_data, self.line_placement)
     
     def inverse(self, verbose : bool = False) -> Matrix:
-        det : Fraction = self.det()
+        det : Fraction = self.det(self.DeterminantTypes.COFACTOR, verbose)
         if det == 0:
             raise ValueError("Determinant is 0 therefore the matrix has no inverse.")
         
