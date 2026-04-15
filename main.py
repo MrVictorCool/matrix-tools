@@ -407,6 +407,28 @@ app.add_command(gauss_det, 'gd')
 
 @app.command()
 @click.argument('mkey', type = str, default = "")
+@click.option('--name', '-n', default = "", type = str, help = "Chose a name to store the matrix, if it is left blank or this argument is not included it goes to the workspace matrix")
+@click.option('--verbose', '-v', is_flag = True, help = "Verbose I guess.")
+def gauss_jordan(mkey, name, verbose):
+    if mkey == "":
+        m : Matrix = sd.current_matrix
+    else :
+        m : Matrix = sd.matrices[mkey]
+
+    result_m : Matrix = m.gauss_jordan(verbose)
+
+    click.echo(result_m)
+
+    if name:
+        sd.matrices[name] = result_m
+    else :
+        sd.current_matrix = result_m
+
+app.add_command(gauss_jordan, 'gaussj')
+app.add_command(gauss_jordan, 'gj')
+
+@app.command()
+@click.argument('mkey', type = str, default = "")
 @click.option('--verbose', '-v', is_flag = True, help = "Verbose I guess.")
 @click.option('--preserve-determinant', '-pd', '-d', is_flag = True, help = "Self explanatory")
 @click.option('--jordan-pivots', '-jp', '-p1', '-j', is_flag = True, help = "Self explanatory")

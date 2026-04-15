@@ -1,0 +1,4 @@
+This programm expects you to have python installed.
+It uses click and click-shell dependencies, setup.bat/setup.sh simply tries installing them.
+And run.bat/run.sh are just shorthand ways to run them.
+Pyhon 3.14 was used to develop it but it should work with some earlier versions.
