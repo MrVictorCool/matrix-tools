@@ -349,7 +349,7 @@ class Matrix:
         det_m: Fraction = Fraction(1)
         for i in range(self.rows):
             det_m *= m[i][i]
-        #TODO: check this works
+
         return det_m
     
     def gauss_jordan(self, verbose: bool = False) -> Matrix:
@@ -363,15 +363,15 @@ class Matrix:
         for c in range(m.rows - 1):
             if m[c][c] == 0:
                 new_pivot_row: int = -1
-                for r in range(1 + c, m.rows):
+                for r in range(m.rows - 1, c, -1): #TODO: check this works
                     if m[r][c] != 0:
                         new_pivot_row = r
                         break
                 
                 if new_pivot_row != -1:
-                    if verbose: print(f"R{c} <-> R{new_pivot_row}")
+                    if verbose: print(f"R{c + 1} <-> R{new_pivot_row + 1}")
                     m = m.swap_row(c, new_pivot_row)
-                    print(m)
+                    print(m, "\n")
                     if preserve_determinant:
                         m = m.scale_row(c, -1)
                         if verbose: 
@@ -392,9 +392,8 @@ class Matrix:
                     if verbose:
                         print(f"R{r + 1} + {-scalar} R{c + 1}")
                         print(m, "\n")
-        print(f"Last check {m[m.rows - 1][m.rows - 1]}")
         if jordan_pivots and m[m.rows - 1][m.rows - 1] != 1:
-                if verbose: print(f"F{m.rows - 1}({m[m.rows - 1][m.rows - 1] ** -1})")
+                if verbose: print(f"R{m.rows}({m[m.rows - 1][m.rows - 1] ** -1})")
                 m = m.scale_row(m.rows - 1, Fraction(1, m[m.rows - 1][m.rows - 1]))
                 if verbose: print(m, "\n")
         
